@@ -1,0 +1,63 @@
+# Development Docker Compose configuration
+# For local development with hot reload
+
+version: '3.8'
+
+services:
+  # Development application service
+  arcon-portal-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: arcon-portal-dev
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ENV=development
+      - VITE_HOST=0.0.0.0
+      - VITE_PORT=8080
+    volumes:
+      - .:/app
+      - /app/node_modules
+    restart: unless-stopped
+    command: npm run dev
+    networks:
+      - arcon-dev-network
+
+  # Development database
+  postgres-dev:
+    image: postgres:15-alpine
+    container_name: arcon-postgres-dev
+    environment:
+      POSTGRES_DB: arcon_portal_dev
+      POSTGRES_USER: dev_user
+      POSTGRES_PASSWORD: dev_password
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+      - ./init-dev.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "5433:5432"
+    restart: unless-stopped
+    networks:
+      - arcon-dev-network
+
+  # Development Redis
+  redis-dev:
+    image: redis:7-alpine
+    container_name: arcon-redis-dev
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_dev_data:/data
+    ports:
+      - "6380:6379"
+    restart: unless-stopped
+    networks:
+      - arcon-dev-network
+
+volumes:
+  postgres_dev_data:
+  redis_dev_data:
+
+networks:
+  arcon-dev-network:
+    driver: bridge

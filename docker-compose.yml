@@ -1,0 +1,100 @@
+# Docker Compose configuration for ARCON e-Ad Approval Portal
+# Production deployment with PostgreSQL and Redis
+
+version: '3.8'
+
+services:
+  # Main application service
+  arcon-portal:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: arcon-portal-app
+    ports:
+      - "80:80"
+    environment:
+      - NODE_ENV=production
+      - NGINX_HOST=localhost
+      - NGINX_PORT=80
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - arcon-network
+
+  # PostgreSQL database (for full backend implementation)
+  postgres:
+    image: postgres:15-alpine
+    container_name: arcon-postgres
+    environment:
+      POSTGRES_DB: arcon_portal
+      POSTGRES_USER: arcon_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secure_password_change_me}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U arcon_user -d arcon_portal"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - arcon-network
+
+  # Redis for caching and sessions
+  redis:
+    image: redis:7-alpine
+    container_name: arcon-redis
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redis_password_change_me}
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - arcon-network
+
+  # Nginx reverse proxy (for production with SSL)
+  nginx-proxy:
+    image: nginx:alpine
+    container_name: arcon-nginx-proxy
+    ports:
+      - "443:443"
+    volumes:
+      - ./nginx-proxy.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - arcon-portal
+    restart: unless-stopped
+    networks:
+      - arcon-network
+    profiles:
+      - production
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  arcon-network:
+    driver: bridge
