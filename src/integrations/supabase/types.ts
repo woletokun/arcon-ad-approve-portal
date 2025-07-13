@@ -14,16 +14,241 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      certificates: {
+        Row: {
+          certificate_number: string
+          created_at: string
+          id: string
+          is_active: boolean | null
+          issued_at: string
+          pdf_url: string | null
+          qr_code_data: string
+          submission_id: string
+          valid_from: string
+          valid_until: string
+        }
+        Insert: {
+          certificate_number: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          issued_at?: string
+          pdf_url?: string | null
+          qr_code_data: string
+          submission_id: string
+          valid_from: string
+          valid_until: string
+        }
+        Update: {
+          certificate_number?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          issued_at?: string
+          pdf_url?: string | null
+          qr_code_data?: string
+          submission_id?: string
+          valid_from?: string
+          valid_until?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "certificates_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: true
+            referencedRelation: "submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          company_name: string | null
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          is_verified: boolean | null
+          phone: string | null
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company_name?: string | null
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          is_verified?: boolean | null
+          phone?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company_name?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          is_verified?: boolean | null
+          phone?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      submission_comments: {
+        Row: {
+          comment: string
+          created_at: string
+          id: string
+          is_internal: boolean | null
+          reviewer_id: string
+          submission_id: string
+        }
+        Insert: {
+          comment: string
+          created_at?: string
+          id?: string
+          is_internal?: boolean | null
+          reviewer_id: string
+          submission_id: string
+        }
+        Update: {
+          comment?: string
+          created_at?: string
+          id?: string
+          is_internal?: boolean | null
+          reviewer_id?: string
+          submission_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "submission_comments_reviewer_id_fkey"
+            columns: ["reviewer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "submission_comments_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      submissions: {
+        Row: {
+          advert_category: Database["public"]["Enums"]["advert_category"]
+          advertiser_id: string
+          brand_name: string
+          campaign_end_date: string
+          campaign_start_date: string
+          campaign_title: string
+          created_at: string
+          creative_materials_urls: string[] | null
+          geographic_details: string | null
+          geographic_scope: Database["public"]["Enums"]["geographic_scope"]
+          id: string
+          notes: string | null
+          payment_confirmed: boolean | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["submission_status"]
+          submitted_at: string
+          supporting_documents_urls: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          advert_category: Database["public"]["Enums"]["advert_category"]
+          advertiser_id: string
+          brand_name: string
+          campaign_end_date: string
+          campaign_start_date: string
+          campaign_title: string
+          created_at?: string
+          creative_materials_urls?: string[] | null
+          geographic_details?: string | null
+          geographic_scope: Database["public"]["Enums"]["geographic_scope"]
+          id?: string
+          notes?: string | null
+          payment_confirmed?: boolean | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["submission_status"]
+          submitted_at?: string
+          supporting_documents_urls?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          advert_category?: Database["public"]["Enums"]["advert_category"]
+          advertiser_id?: string
+          brand_name?: string
+          campaign_end_date?: string
+          campaign_start_date?: string
+          campaign_title?: string
+          created_at?: string
+          creative_materials_urls?: string[] | null
+          geographic_details?: string | null
+          geographic_scope?: Database["public"]["Enums"]["geographic_scope"]
+          id?: string
+          notes?: string | null
+          payment_confirmed?: boolean | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["submission_status"]
+          submitted_at?: string
+          supporting_documents_urls?: string[] | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "submissions_advertiser_id_fkey"
+            columns: ["advertiser_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "submissions_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_certificate_number: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
-      [_ in never]: never
+      advert_category:
+        | "tv"
+        | "radio"
+        | "billboard"
+        | "digital"
+        | "print"
+        | "online"
+      geographic_scope: "national" | "state" | "lga" | "regional"
+      submission_status:
+        | "pending"
+        | "under_review"
+        | "approved"
+        | "rejected"
+        | "requires_changes"
+      user_role: "advertiser" | "reviewer" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +375,24 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      advert_category: [
+        "tv",
+        "radio",
+        "billboard",
+        "digital",
+        "print",
+        "online",
+      ],
+      geographic_scope: ["national", "state", "lga", "regional"],
+      submission_status: [
+        "pending",
+        "under_review",
+        "approved",
+        "rejected",
+        "requires_changes",
+      ],
+      user_role: ["advertiser", "reviewer", "admin"],
+    },
   },
 } as const

@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Link } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import { 
   Shield, 
   FileCheck, 
@@ -28,6 +30,7 @@ import {
  */
 
 export const Landing = () => {
+  const { user } = useAuth();
   const [selectedRole, setSelectedRole] = useState<'advertiser' | 'reviewer'>('advertiser');
 
   const features = {
@@ -135,13 +138,26 @@ export const Landing = () => {
               Get your campaigns approved faster with automated workflows and instant e-certificates.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="text-lg px-8">
-                Submit Your Ad
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-              <Button variant="outline" size="lg" className="text-lg px-8">
-                Verify Certificate
-              </Button>
+              {user ? (
+                <Link to="/submit">
+                  <Button size="lg" className="text-lg px-8">
+                    Submit Your Ad
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
+              ) : (
+                <Link to="/auth">
+                  <Button size="lg" className="text-lg px-8">
+                    Get Started
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
+              )}
+              <Link to="/verify">
+                <Button variant="outline" size="lg" className="text-lg px-8">
+                  Verify Certificate
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
