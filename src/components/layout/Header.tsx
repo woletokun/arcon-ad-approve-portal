@@ -8,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 /**
  * Header Component
@@ -25,6 +26,7 @@ interface HeaderProps {
     name: string;
     email: string;
     role: 'advertiser' | 'reviewer' | 'admin';
+    avatar_url?: string;
   };
   onLogout?: () => void;
 }
@@ -67,20 +69,23 @@ export const Header = ({ user, onLogout }: HeaderProps) => {
                 </Button>
 
                 {/* User Dropdown */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="flex items-center space-x-2">
-                      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                        <User className="h-4 w-4 text-primary" />
-                      </div>
-                      <div className="hidden md:flex flex-col items-start">
-                        <span className="text-sm font-medium">{user.name}</span>
-                        <span className="text-xs text-muted-foreground capitalize">
-                          {user.role}
-                        </span>
-                      </div>
-                    </Button>
-                  </DropdownMenuTrigger>
+                 <DropdownMenu>
+                   <DropdownMenuTrigger asChild>
+                     <Button variant="ghost" className="flex items-center space-x-2">
+                       <Avatar className="h-8 w-8">
+                         <AvatarImage src={user.avatar_url} alt={user.name} />
+                         <AvatarFallback>
+                           <User className="h-4 w-4" />
+                         </AvatarFallback>
+                       </Avatar>
+                       <div className="hidden md:flex flex-col items-start">
+                         <span className="text-sm font-medium">{user.name}</span>
+                         <span className="text-xs text-muted-foreground capitalize">
+                           {user.role}
+                         </span>
+                       </div>
+                     </Button>
+                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
                     <DropdownMenuItem className="flex flex-col items-start p-3">
                       <div className="font-medium">{user.name}</div>
