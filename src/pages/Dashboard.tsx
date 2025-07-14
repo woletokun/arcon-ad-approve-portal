@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 import { Header } from "@/components/layout/Header";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ProfileSettings } from "@/components/ProfileSettings";
 import { 
   FileText, 
   Clock, 
@@ -73,12 +75,16 @@ interface DashboardProps {
   userRole?: 'advertiser' | 'reviewer' | 'admin';
 }
 
-export const Dashboard = ({ userRole = 'advertiser' }: DashboardProps) => {
-  const [user] = useState({
-    name: "John Doe",
-    email: "john.doe@example.com",
-    role: userRole
-  });
+export const Dashboard = ({ userRole }: DashboardProps) => {
+  const { profile, signOut } = useAuth();
+  const [activeView, setActiveView] = useState('dashboard');
+
+  const user = profile ? {
+    name: profile.full_name,
+    email: profile.email,
+    role: profile.role,
+    avatar_url: profile.avatar_url
+  } : null;
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -198,23 +204,42 @@ export const Dashboard = ({ userRole = 'advertiser' }: DashboardProps) => {
     </div>
   );
 
+  if (!profile) {
+    return <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="text-center">
+        <h2 className="text-2xl font-bold mb-2">Loading...</h2>
+        <p className="text-muted-foreground">Please wait while we load your profile.</p>
+      </div>
+    </div>;
+  }
+
   return (
     <div className="min-h-screen bg-background">
-      <Header user={user} />
+      <Header user={user} onLogout={signOut} />
       
       <div className="flex h-[calc(100vh-4rem)]">
-        <Sidebar userRole={userRole} pendingCount={mockData.reviewer.queue.pending} />
+        <Sidebar 
+          userRole={profile.role} 
+          pendingCount={mockData.reviewer.queue.pending}
+          onViewChange={setActiveView}
+        />
         
         <main className="flex-1 overflow-auto">
           <div className="container mx-auto p-6">
-            <div className="mb-6">
-              <h1 className="text-3xl font-bold">Dashboard</h1>
-              <p className="text-muted-foreground">
-                Welcome back, {user.name}. Here's your portal overview.
-              </p>
-            </div>
-            
-            {renderAdvertiserDashboard()}
+            {activeView === 'profile' ? (
+              <ProfileSettings />
+            ) : (
+              <>
+                <div className="mb-6">
+                  <h1 className="text-3xl font-bold">Dashboard</h1>
+                  <p className="text-muted-foreground">
+                    Welcome back, {profile.full_name}. Here's your portal overview.
+                  </p>
+                </div>
+                
+                {renderAdvertiserDashboard()}
+              </>
+            )}
           </div>
         </main>
       </div>

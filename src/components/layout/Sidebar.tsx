@@ -28,9 +28,10 @@ interface SidebarProps {
   userRole: 'advertiser' | 'reviewer' | 'admin';
   pendingCount?: number;
   className?: string;
+  onViewChange?: (view: string) => void;
 }
 
-export const Sidebar = ({ userRole, pendingCount = 0, className }: SidebarProps) => {
+export const Sidebar = ({ userRole, pendingCount = 0, className, onViewChange }: SidebarProps) => {
   const location = useLocation();
 
   // Navigation items based on user role
@@ -108,20 +109,28 @@ export const Sidebar = ({ userRole, pendingCount = 0, className }: SidebarProps)
         roles: ['admin'],
         badge: undefined as number | undefined
       },
-      {
-        title: "Settings",
-        href: "/settings",
-        icon: Settings,
-        roles: ['admin'],
-        badge: undefined as number | undefined
-      }
-    ];
+       {
+         title: "Settings",
+         href: "/settings",
+         icon: Settings,
+         roles: ['admin'],
+         badge: undefined as number | undefined
+       }
+     ];
 
-    return [...baseItems, ...advertiserItems, ...reviewerItems, ...adminItems]
-      .filter(item => item.roles.includes(userRole));
-  };
+     const profileItem = {
+       title: "Profile",
+       href: "#profile", 
+       icon: Settings,
+       roles: ['advertiser', 'reviewer', 'admin'],
+       badge: undefined as number | undefined
+     };
 
-  const navigationItems = getNavigationItems();
+     return [...baseItems, ...advertiserItems, ...reviewerItems, ...adminItems, profileItem]
+       .filter(item => item.roles.includes(userRole));
+   };
+
+   const navigationItems = getNavigationItems();
 
   return (
     <aside className={cn(
@@ -145,31 +154,54 @@ export const Sidebar = ({ userRole, pendingCount = 0, className }: SidebarProps)
           const Icon = item.icon;
           const isActive = location.pathname === item.href;
           
-          return (
-            <NavLink
-              key={item.href}
-              to={item.href}
-              className={cn(
-                "flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md transition-colors",
-                isActive
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
-              )}
-            >
-              <div className="flex items-center space-x-3">
-                <Icon className="h-4 w-4" />
-                <span>{item.title}</span>
-              </div>
-              {item.badge && (
-                <Badge 
-                  variant={isActive ? "secondary" : "destructive"} 
-                  className="h-5 w-5 p-0 text-xs"
-                >
-                  {item.badge}
-                </Badge>
-              )}
-            </NavLink>
-          );
+           return item.href === '#profile' ? (
+             <button
+               key={item.href}
+               onClick={() => onViewChange?.('profile')}
+               className={cn(
+                 "flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md transition-colors text-left",
+                 "text-muted-foreground hover:text-foreground hover:bg-muted"
+               )}
+             >
+               <div className="flex items-center space-x-3">
+                 <Icon className="h-4 w-4" />
+                 <span>{item.title}</span>
+               </div>
+               {item.badge && (
+                 <Badge 
+                   variant="destructive" 
+                   className="h-5 w-5 p-0 text-xs"
+                 >
+                   {item.badge}
+                 </Badge>
+               )}
+             </button>
+           ) : (
+             <NavLink
+               key={item.href}
+               to={item.href}
+               onClick={() => onViewChange?.('dashboard')}
+               className={cn(
+                 "flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md transition-colors",
+                 isActive
+                   ? "bg-primary text-primary-foreground"
+                   : "text-muted-foreground hover:text-foreground hover:bg-muted"
+               )}
+             >
+               <div className="flex items-center space-x-3">
+                 <Icon className="h-4 w-4" />
+                 <span>{item.title}</span>
+               </div>
+               {item.badge && (
+                 <Badge 
+                   variant={isActive ? "secondary" : "destructive"} 
+                   className="h-5 w-5 p-0 text-xs"
+                 >
+                   {item.badge}
+                 </Badge>
+               )}
+             </NavLink>
+           );
         })}
       </nav>
 
