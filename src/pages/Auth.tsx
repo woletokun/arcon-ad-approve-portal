@@ -78,7 +78,7 @@ export const Auth = () => {
     } else {
       toast({
         title: "Account Created!",
-        description: "Please check your email to verify your account.",
+        description: "Please check your email to verify your account. You may need to check your spam folder.",
       });
     }
 
