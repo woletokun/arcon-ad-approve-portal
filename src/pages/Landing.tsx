@@ -116,8 +116,12 @@ export const Landing = () => {
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              <Button variant="ghost">Sign In</Button>
-              <Button>Get Started</Button>
+              <Button variant="ghost" asChild>
+                <Link to="/auth">Sign In</Link>
+              </Button>
+              <Button asChild>
+                <Link to="/auth">Get Started</Link>
+              </Button>
             </div>
           </div>
         </div>
@@ -279,12 +283,12 @@ export const Landing = () => {
                 Join hundreds of advertisers already using ARCON's digital approval platform. 
                 Submit your first campaign today.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" variant="secondary" className="text-lg px-8">
-                  Create Account
+               <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button size="lg" variant="secondary" className="text-lg px-8" asChild>
+                  <Link to="/auth">Create Account</Link>
                 </Button>
-                <Button size="lg" variant="outline" className="text-lg px-8 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
-                  Learn More
+                <Button size="lg" variant="outline" className="text-lg px-8 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary" asChild>
+                  <Link to="/verify">Learn More</Link>
                 </Button>
               </div>
             </CardContent>

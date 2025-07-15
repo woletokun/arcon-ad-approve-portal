@@ -8,6 +8,7 @@ import { Landing } from "./pages/Landing";
 import { Dashboard } from "./pages/Dashboard";
 import { Auth } from "./pages/Auth";
 import { SubmitAd } from "./pages/SubmitAd";
+import { MySubmissions } from "./pages/MySubmissions";
 import { ReviewPanel } from "./pages/ReviewPanel";
 import { Verify } from "./pages/Verify";
 import { AuthProvider } from "./hooks/useAuth";
@@ -25,8 +26,9 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/auth" element={<Auth />} />
-            <Route path="/dashboard" element={<Dashboard userRole="advertiser" />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/submit" element={<SubmitAd />} />
+            <Route path="/my-submissions" element={<MySubmissions />} />
             <Route path="/review" element={<ReviewPanel />} />
             <Route path="/verify" element={<Verify />} />
             <Route path="/verify/:certificateId" element={<Verify />} />

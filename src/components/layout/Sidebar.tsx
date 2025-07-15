@@ -56,7 +56,7 @@ export const Sidebar = ({ userRole, pendingCount = 0, className, onViewChange }:
       },
       {
         title: "My Submissions",
-        href: "/submissions",
+        href: "/my-submissions",
         icon: FileText,
         roles: ['advertiser'],
         badge: undefined as number | undefined

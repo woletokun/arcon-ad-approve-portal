@@ -190,13 +190,20 @@ export const Dashboard = ({ userRole }: DashboardProps) => {
         </CardHeader>
         <CardContent>
           <div className="grid gap-3 md:grid-cols-2">
-            <Button className="h-auto p-4 flex flex-col space-y-2">
+            <Button 
+              className="h-auto p-4 flex flex-col space-y-2"
+              onClick={() => window.location.href = '/submit'}
+            >
               <FileText className="h-6 w-6" />
               <span>Submit New Ad</span>
             </Button>
-            <Button variant="outline" className="h-auto p-4 flex flex-col space-y-2">
+            <Button 
+              variant="outline" 
+              className="h-auto p-4 flex flex-col space-y-2"
+              onClick={() => window.location.href = '/verify'}
+            >
               <CheckCircle className="h-6 w-6" />
-              <span>Download Certificates</span>
+              <span>Verify Certificates</span>
             </Button>
           </div>
         </CardContent>

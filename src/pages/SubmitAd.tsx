@@ -20,14 +20,19 @@ export const SubmitAd = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [creativeFiles, setCreativeFiles] = useState<File[]>([]);
+  const [supportingFiles, setSupportingFiles] = useState<File[]>([]);
   const { profile } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, type: 'creative' | 'supporting') => {
     const files = Array.from(e.target.files || []);
-    setUploadedFiles(prev => [...prev, ...files]);
+    if (type === 'creative') {
+      setCreativeFiles(files);
+    } else {
+      setSupportingFiles(files);
+    }
   };
 
   const uploadFiles = async (files: File[], bucketName: string, folder: string) => {
@@ -55,11 +60,8 @@ export const SubmitAd = () => {
       const formData = new FormData(e.currentTarget);
       
       // Upload files
-      const creativeFiles = Array.from((document.getElementById('creative-materials') as HTMLInputElement)?.files || []);
-      const supportingFiles = Array.from((document.getElementById('supporting-documents') as HTMLInputElement)?.files || []);
-      
-      const creativeUrls = await uploadFiles(creativeFiles, 'creative-materials', profile?.id);
-      const supportingUrls = await uploadFiles(supportingFiles, 'supporting-documents', profile?.id);
+      const creativeUrls = await uploadFiles(creativeFiles, 'creative-materials', profile?.id || 'anonymous');
+      const supportingUrls = await uploadFiles(supportingFiles, 'supporting-documents', profile?.id || 'anonymous');
 
       // Submit application
       const { error } = await supabase
@@ -284,6 +286,13 @@ export const SubmitAd = () => {
                           disabled={isLoading}
                         />
                       </div>
+                      {creativeFiles.length > 0 && (
+                        <div className="mt-2">
+                          <p className="text-sm text-muted-foreground">
+                            {creativeFiles.length} file(s) selected
+                          </p>
+                        </div>
+                      )}
                       <p className="text-xs text-muted-foreground mt-2">
                         Images, videos, audio files, scripts (max 10MB each)
                       </p>
@@ -311,6 +320,13 @@ export const SubmitAd = () => {
                           disabled={isLoading}
                         />
                       </div>
+                      {supportingFiles.length > 0 && (
+                        <div className="mt-2">
+                          <p className="text-sm text-muted-foreground">
+                            {supportingFiles.length} file(s) selected
+                          </p>
+                        </div>
+                      )}
                       <p className="text-xs text-muted-foreground mt-2">
                         Briefs, disclaimers, compliance documents (PDF, DOC)
                       </p>
