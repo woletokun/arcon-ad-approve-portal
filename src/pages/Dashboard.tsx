@@ -6,28 +6,21 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ProfileSettings } from "@/components/ProfileSettings";
-import { 
-  FileText, 
-  Clock, 
-  CheckCircle, 
-  XCircle, 
-  TrendingUp,
-  Users,
-  Shield,
-  AlertTriangle
+import { Navigate } from "react-router-dom";
+import {
+  FileText,
+  Clock,
+  CheckCircle,
+  XCircle
 } from "lucide-react";
 
 /**
  * Dashboard Component
  * 
  * Main dashboard for ARCON e-Ad Approval Portal
- * Features role-based content display:
- * - Advertiser: Submission overview, recent submissions, quick actions
- * - Reviewer: Review queue, pending approvals, recent activity
- * - Admin: System overview, user statistics, platform health
+ * Handles loading, missing profile, and redirects gracefully.
  */
 
-// Mock data for demo purposes
 const mockData = {
   advertiser: {
     submissions: {
@@ -44,55 +37,53 @@ const mockData = {
   },
   reviewer: {
     queue: {
-      pending: 15,
-      urgent: 3,
-      reviewed_today: 8,
-      avg_review_time: "2.5 hours"
-    },
-    recentActivity: [
-      { id: "REV-001", title: "Pepsi Billboard Campaign", action: "approved", date: "2024-01-15" },
-      { id: "REV-002", title: "MTN Data Plan Ad", action: "requested_changes", date: "2024-01-15" },
-      { id: "REV-003", title: "Dangote Cement TV Ad", action: "approved", date: "2024-01-14" }
-    ]
-  },
-  admin: {
-    stats: {
-      total_users: 234,
-      active_advertisers: 89,
-      active_reviewers: 12,
-      submissions_this_month: 156
-    },
-    systemHealth: {
-      uptime: "99.9%",
-      avg_response_time: "245ms",
-      storage_used: "68%",
-      active_sessions: 45
+      pending: 15
     }
   }
 };
 
-interface DashboardProps {
-  userRole?: 'advertiser' | 'reviewer' | 'admin';
-}
+export const Dashboard = () => {
+  const { user, profile, loading, signOut } = useAuth();
+  const [activeView, setActiveView] = useState("dashboard");
 
-export const Dashboard = ({ userRole }: DashboardProps) => {
-  const { profile, signOut } = useAuth();
-  const [activeView, setActiveView] = useState('dashboard');
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-2">Loading...</h2>
+          <p className="text-muted-foreground">Please wait while we load your profile.</p>
+        </div>
+      </div>
+    );
+  }
 
-  const user = profile ? {
-    name: profile.full_name,
-    email: profile.email,
-    role: profile.role,
-    avatar_url: profile.avatar_url
-  } : null;
+  if (!user) {
+    return <Navigate to="/auth" />;
+  }
+
+  if (!profile) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-bold text-destructive mb-2">Profile not found</h2>
+          <p className="text-muted-foreground">Please ensure your account has a profile record in Supabase.</p>
+        </div>
+      </div>
+    );
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'approved': return 'success';
-      case 'pending': return 'warning';
-      case 'rejected': return 'destructive';
-      case 'under_review': return 'secondary';
-      default: return 'secondary';
+      case "approved":
+        return "success";
+      case "pending":
+        return "warning";
+      case "rejected":
+        return "destructive";
+      case "under_review":
+        return "secondary";
+      default:
+        return "secondary";
     }
   };
 
@@ -100,57 +91,41 @@ export const Dashboard = ({ userRole }: DashboardProps) => {
     <div className="space-y-6">
       {/* Stats Overview */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Submissions</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{mockData.advertiser.submissions.total}</div>
-            <p className="text-xs text-muted-foreground">
-              +2 from last month
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Review</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{mockData.advertiser.submissions.pending}</div>
-            <p className="text-xs text-muted-foreground">
-              Awaiting ARCON review
-            </p>
-          </CardContent>
-        </Card>
+        {["total", "pending", "approved", "rejected"].map((key) => {
+          const titleMap: any = {
+            total: "Total Submissions",
+            pending: "Pending Review",
+            approved: "Approved",
+            rejected: "Rejected"
+          };
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Approved</CardTitle>
-            <CheckCircle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-success">{mockData.advertiser.submissions.approved}</div>
-            <p className="text-xs text-muted-foreground">
-              Ready for publication
-            </p>
-          </CardContent>
-        </Card>
+          const iconMap: any = {
+            total: FileText,
+            pending: Clock,
+            approved: CheckCircle,
+            rejected: XCircle
+          };
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Rejected</CardTitle>
-            <XCircle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-destructive">{mockData.advertiser.submissions.rejected}</div>
-            <p className="text-xs text-muted-foreground">
-              Requires revision
-            </p>
-          </CardContent>
-        </Card>
+          const Icon = iconMap[key];
+          const count = mockData.advertiser.submissions[key as keyof typeof mockData.advertiser.submissions];
+
+          return (
+            <Card key={key}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">{titleMap[key]}</CardTitle>
+                <Icon className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className={`text-2xl font-bold ${key === "approved" ? "text-success" : key === "rejected" ? "text-destructive" : ""}`}>
+                  {count}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {key === "pending" ? "Awaiting ARCON review" : key === "approved" ? "Ready for publication" : key === "rejected" ? "Requires revision" : "+2 from last month"}
+                </p>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
 
       {/* Recent Submissions */}
@@ -169,7 +144,7 @@ export const Dashboard = ({ userRole }: DashboardProps) => {
                 </div>
                 <div className="flex items-center space-x-2">
                   <Badge variant={getStatusColor(submission.status) as any}>
-                    {submission.status.replace('_', ' ')}
+                    {submission.status.replace("_", " ")}
                   </Badge>
                   <span className="text-sm text-muted-foreground">{submission.date}</span>
                 </div>
@@ -190,17 +165,17 @@ export const Dashboard = ({ userRole }: DashboardProps) => {
         </CardHeader>
         <CardContent>
           <div className="grid gap-3 md:grid-cols-2">
-            <Button 
+            <Button
               className="h-auto p-4 flex flex-col space-y-2"
-              onClick={() => window.location.href = '/submit'}
+              onClick={() => (window.location.href = "/submit")}
             >
               <FileText className="h-6 w-6" />
               <span>Submit New Ad</span>
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="h-auto p-4 flex flex-col space-y-2"
-              onClick={() => window.location.href = '/verify'}
+              onClick={() => (window.location.href = "/verify")}
             >
               <CheckCircle className="h-6 w-6" />
               <span>Verify Certificates</span>
@@ -211,29 +186,25 @@ export const Dashboard = ({ userRole }: DashboardProps) => {
     </div>
   );
 
-  if (!profile) {
-    return <div className="min-h-screen bg-background flex items-center justify-center">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold mb-2">Loading...</h2>
-        <p className="text-muted-foreground">Please wait while we load your profile.</p>
-      </div>
-    </div>;
-  }
+  const userInfo = {
+    name: profile.full_name,
+    email: profile.email,
+    role: profile.role,
+    avatar_url: profile.avatar_url
+  };
 
   return (
     <div className="min-h-screen bg-background">
-      <Header user={user} onLogout={signOut} />
-      
+      <Header user={userInfo} onLogout={signOut} />
       <div className="flex h-[calc(100vh-4rem)]">
-        <Sidebar 
-          userRole={profile.role} 
+        <Sidebar
+          userRole={profile.role}
           pendingCount={mockData.reviewer.queue.pending}
           onViewChange={setActiveView}
         />
-        
         <main className="flex-1 overflow-auto">
           <div className="container mx-auto p-6">
-            {activeView === 'profile' ? (
+            {activeView === "profile" ? (
               <ProfileSettings />
             ) : (
               <>
@@ -243,7 +214,6 @@ export const Dashboard = ({ userRole }: DashboardProps) => {
                     Welcome back, {profile.full_name}. Here's your portal overview.
                   </p>
                 </div>
-                
                 {renderAdvertiserDashboard()}
               </>
             )}
