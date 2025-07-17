@@ -4,40 +4,50 @@ import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useAuth } from "@/lib/auth";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2, ShieldCheck } from "lucide-react";
 
-const { signIn, signUp, user, loading } = useAuth();
-
-// ✅ Redirect if already authenticated
-useEffect(() => {
-  if (!loading && user) {
-    navigate("/dashboard");
-  }
-}, [user, loading, navigate]);
-
-// ✅ Optional: show loading indicator
-if (loading) {
-  return <div className="text-center mt-10">Checking session...</div>;
-}
-
-
 export const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn, signUp, user } = useAuth();
+  const { signIn, signUp, user, loading } = useAuth(); // ✅ includes loading
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Redirect to dashboard if already logged in
   useEffect(() => {
     if (user) {
       navigate("/dashboard");
     }
   }, [user, navigate]);
+
+  // ✅ Safe render while checking session
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-muted-foreground text-lg">Checking session...</div>
+      </div>
+    );
+  }
 
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -60,10 +70,7 @@ export const Auth = () => {
         title: "Welcome back!",
         description: "Signing you in...",
       });
-
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 1000);
+      setTimeout(() => navigate("/dashboard"), 1000);
     }
 
     setIsLoading(false);
@@ -114,7 +121,9 @@ export const Auth = () => {
             </div>
           </div>
           <h1 className="text-2xl font-bold">ARCON e-Ad Portal</h1>
-          <p className="text-muted-foreground">Advertisement Approval & Verification System</p>
+          <p className="text-muted-foreground">
+            Advertisement Approval & Verification System
+          </p>
         </div>
 
         <Card>
