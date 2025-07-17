@@ -11,6 +11,21 @@ import { useAuth } from "@/lib/auth";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2, ShieldCheck } from "lucide-react";
 
+const { signIn, signUp, user, loading } = useAuth();
+
+// ✅ Redirect if already authenticated
+useEffect(() => {
+  if (!loading && user) {
+    navigate("/dashboard");
+  }
+}, [user, loading, navigate]);
+
+// ✅ Optional: show loading indicator
+if (loading) {
+  return <div className="text-center mt-10">Checking session...</div>;
+}
+
+
 export const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { signIn, signUp, user } = useAuth();
