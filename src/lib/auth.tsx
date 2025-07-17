@@ -1,14 +1,20 @@
 // src/lib/auth.tsx
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
 import { supabase } from "@/lib/supabase";
 
-// Define the shape of the AuthContext
+// Define the shape of your context
 interface AuthContextType {
   user: any;
   profile: any;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<any>;
-  signUp: (email: string, password: string, metadata: any) => Promise<any>;
+  signUp: (email: string, password: string, metadata: Record<string, any>) => Promise<any>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -18,7 +24,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch user profile from Supabase "profiles" table
+  // Fetch the user profile from Supabase
   const fetchProfile = async (userId: string) => {
     const { data, error } = await supabase
       .from("profiles")
@@ -33,16 +39,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // Initialize session and user on mount
+  // Load session and user on mount
   useEffect(() => {
     const getSession = async () => {
       const {
         data: { session },
       } = await supabase.auth.getSession();
 
-      if (session?.user) {
-        setUser(session.user);
-        await fetchProfile(session.user.id);
+      const currentUser = session?.user;
+      if (currentUser) {
+        setUser(currentUser);
+        await fetchProfile(currentUser.id);
       }
 
       setLoading(false);
@@ -50,47 +57,61 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     getSession();
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        if (session?.user) {
-          setUser(session.user);
-          await fetchProfile(session.user.id);
-        } else {
-          setUser(null);
-          setProfile(null);
-        }
-      }
-    );
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      const currentUser = session?.user;
 
-    return () => authListener?.subscription?.unsubscribe();
+      if (currentUser) {
+        setUser(currentUser);
+        await fetchProfile(currentUser.id);
+      } else {
+        setUser(null);
+        setProfile(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  // Login
-  const signIn = (email: string, password: string) =>
-    supabase.auth.signInWithPassword({ email, password });
+  const signIn = (email: string, password: string) => {
+    return supabase.auth.signInWithPassword({ email, password });
+  };
 
-  // Register
-  const signUp = (email: string, password: string, metadata: any) =>
-    supabase.auth.signUp({
+  const signUp = (
+    email: string,
+    password: string,
+    metadata: Record<string, any>
+  ) => {
+    return supabase.auth.signUp({
       email,
       password,
       options: {
         data: metadata,
       },
     });
+  };
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, signIn, signUp }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        profile,
+        loading,
+        signIn,
+        signUp,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
-// useAuth Hook with error handling
-export const useAuth = (): AuthContextType => {
+// ✅ Custom hook with error handling
+export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("❌ useAuth must be used within <AuthProvider>");
+    throw new Error("useAuth must be used within an <AuthProvider>");
   }
   return context;
 };
