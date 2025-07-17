@@ -12,6 +12,13 @@ import { MySubmissions } from "./pages/MySubmissions";
 import { ReviewPanel } from "./pages/ReviewPanel";
 import { Verify } from "./pages/Verify";
 import { AuthProvider } from "./hooks/useAuth";
+function App() {
+  return (
+    <AuthProvider>
+      <YourRoutes />
+    </AuthProvider>
+  );
+}
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
