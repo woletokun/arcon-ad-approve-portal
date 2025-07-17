@@ -13,18 +13,26 @@ export const Dashboard = () => {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const {
-        data: { session },
-        error: sessionError,
-      } = await supabase.auth.getSession();
+ useEffect(() => {
+  const fetchUser = async () => {
+    setLoading(true);
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
 
-      if (sessionError) {
-        setError("Failed to get session.");
-        setLoading(false);
-        return;
-      }
+    if (userError || !user) {
+      navigate("/auth");
+      return;
+    }
+
+    setUser({ id: user.id, email: user.email ?? "" });
+    setLoading(false);
+  };
+
+  fetchUser();
+}, [navigate]);
+
 
       const currentUser = session?.user;
       if (!currentUser) {
