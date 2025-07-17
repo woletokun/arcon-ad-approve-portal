@@ -9,7 +9,6 @@ export const AuthProvider = ({ children }) => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // 🔁 Fetch user profile from 'profiles' table
   const fetchProfile = async (userId) => {
     const { data, error } = await supabase
       .from("profiles")
@@ -17,28 +16,19 @@ export const AuthProvider = ({ children }) => {
       .eq("id", userId)
       .single();
 
-    if (error) {
-      console.error("Error fetching profile:", error.message);
-    } else {
-      setProfile(data);
-    }
+    if (error) console.error("Error fetching profile:", error.message);
+    else setProfile(data);
   };
 
-  // 🔐 Load session and user on mount
   useEffect(() => {
     const getSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
+      const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         setUser(session.user);
         await fetchProfile(session.user.id);
       }
-
       setLoading(false);
     };
-
     getSession();
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
@@ -50,25 +40,21 @@ export const AuthProvider = ({ children }) => {
           setUser(null);
           setProfile(null);
         }
-        setLoading(false);
+        setLoading(false); // ✅ Important for post-auth state
       }
     );
 
     return () => authListener?.subscription?.unsubscribe();
   }, []);
 
-  // 🧠 Sign in method
   const signIn = (email, password) =>
     supabase.auth.signInWithPassword({ email, password });
 
-  // 🧠 Sign up method
   const signUp = (email, password, metadata) =>
     supabase.auth.signUp({
       email,
       password,
-      options: {
-        data: metadata,
-      },
+      options: { data: metadata },
     });
 
   return (
@@ -78,7 +64,7 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// ✅ Safe useAuth hook with error check
+// ✅ Final correct and ONLY useAuth hook
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) throw new Error("useAuth must be used within <AuthProvider>");
