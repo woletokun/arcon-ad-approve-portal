@@ -19,14 +19,14 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <AuthProvider>
+      <AuthProvider> {/* ✅ this must wrap everything */}
         <Toaster />
         <Sonner />
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/auth" element={<Auth />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard" element={<Dashboard />} /> {/* etc */}
             <Route path="/submit" element={<SubmitAd />} />
             <Route path="/my-submissions" element={<MySubmissions />} />
             <Route path="/review" element={<ReviewPanel />} />
