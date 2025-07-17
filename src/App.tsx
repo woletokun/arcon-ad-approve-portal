@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Landing } from "./pages/Landing";
 import { Dashboard } from "./pages/Dashboard";
 import { Auth } from "./pages/Auth";
+import { useAuth } from "@/lib/auth";
 import { SubmitAd } from "./pages/SubmitAd";
 import { MySubmissions } from "./pages/MySubmissions";
 import { ReviewPanel } from "./pages/ReviewPanel";
