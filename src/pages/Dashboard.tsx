@@ -1,44 +1,35 @@
-// src/pages/dashboard.tsx or wherever you route this
-import { useAuth } from "@/lib/auth";
-import { Navigate } from "react-router-dom";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
+import { useNavigate } from "react-router-dom";
 
-export default function Dashboard() {
-  const { user, profile, loading } = useAuth();
+export const Dashboard = () => {
+  const [loading, setLoading] = useState(true);
+  const [session, setSession] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check user session on mount
+    const getSession = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (error || !data?.session) {
+        navigate("/auth");
+      } else {
+        setSession(data.session);
+      }
+      setLoading(false);
+    };
+
+    getSession();
+  }, [navigate]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground text-sm">Loading...</p>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return <Navigate to="/auth" />;
-  }
-
-  if (!profile) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-xl font-bold text-destructive mb-2">No profile data</h2>
-          <p className="text-muted-foreground">We couldn’t load your profile. Please try again.</p>
-          <Button onClick={() => window.location.reload()} className="mt-4">Retry</Button>
-        </div>
-      </div>
-    );
+    return <p>Loading dashboard...</p>;
   }
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      <Card className="max-w-md mx-auto">
-        <CardContent className="space-y-4 p-6">
-          <h2 className="text-xl font-semibold">Welcome, {profile.full_name || profile.username || profile.email}</h2>
-          <p className="text-muted-foreground text-sm">Email: {user.email}</p>
-        </CardContent>
-      </Card>
+    <div className="p-6">
+      <h1 className="text-2xl font-bold">Welcome to your Dashboard</h1>
+      <p className="mt-2 text-gray-600">User: {session?.user?.email}</p>
     </div>
   );
-}
+};
