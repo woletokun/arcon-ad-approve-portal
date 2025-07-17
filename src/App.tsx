@@ -22,68 +22,65 @@ import { ReviewPanel } from "@/pages/ReviewPanel";
 import { Verify } from "@/pages/Verify";
 import NotFound from "@/pages/NotFound";
 
-// ✅ Initialize React Query Client
+// 🧠 Initialize React Query Client
 const queryClient = new QueryClient();
 
-// ✅ Main Application Component
-const App = () => {
-  return (
-    <AuthProvider>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
+const App = () => (
+  <AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
 
-          <BrowserRouter>
-            <Routes>
-              {/* Public Routes */}
-              <Route path="/" element={<Landing />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/verify" element={<Verify />} />
-              <Route path="/verify/:certificateId" element={<Verify />} />
+        <BrowserRouter>
+          <Routes>
+            {/* 🔓 Public Routes */}
+            <Route path="/" element={<Landing />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/verify" element={<Verify />} />
+            <Route path="/verify/:certificateId" element={<Verify />} />
 
-              {/* Protected Routes */}
-              <Route
-                path="/dashboard"
-                element={
-                  <ProtectedRoute>
-                    <Dashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/submit"
-                element={
-                  <ProtectedRoute>
-                    <SubmitAd />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/my-submissions"
-                element={
-                  <ProtectedRoute>
-                    <MySubmissions />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/review"
-                element={
-                  <ProtectedRoute>
-                    <ReviewPanel />
-                  </ProtectedRoute>
-                }
-              />
+            {/* 🔐 Protected Routes */}
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/submit"
+              element={
+                <ProtectedRoute>
+                  <SubmitAd />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/my-submissions"
+              element={
+                <ProtectedRoute>
+                  <MySubmissions />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/review"
+              element={
+                <ProtectedRoute>
+                  <ReviewPanel />
+                </ProtectedRoute>
+              }
+            />
 
-              {/* 404 Fallback */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </QueryClientProvider>
-    </AuthProvider>
-  );
-};
+            {/* 🚫 404 Fallback */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </AuthProvider>
+);
 
 export default App;
