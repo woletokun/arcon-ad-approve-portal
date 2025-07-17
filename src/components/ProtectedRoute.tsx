@@ -5,6 +5,8 @@ import { useAuth } from "@/lib/auth";
 export const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const { user, loading } = useAuth();
 
-  if (loading) return null; // Or a loading spinner component
-  return user ? children : <Navigate to="/auth" replace />;
+  if (loading) return <div className="text-center p-8">Loading...</div>;
+  if (!user) return <Navigate to="/auth" replace />;
+
+  return children;
 };
