@@ -60,12 +60,6 @@ export const AuthProvider = ({ children }) => {
   const signIn = (email, password) =>
     supabase.auth.signInWithPassword({ email, password });
 
-  const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used within <AuthProvider>");
-  return context;
-};
-
   // 🧠 Sign up method
   const signUp = (email, password, metadata) =>
     supabase.auth.signUp({
@@ -83,4 +77,9 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+// ✅ Safe useAuth hook with error check
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) throw new Error("useAuth must be used within <AuthProvider>");
+  return context;
+};
