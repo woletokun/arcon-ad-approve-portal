@@ -1,18 +1,14 @@
-// lib/supabase.ts
+// src/lib/supabase.ts
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Make sure these environment variables are defined
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL!;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY!;
 
-let supabase: ReturnType<typeof createClient>;
-
-if (!supabase) {
-  supabase = createClient(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-    },
-  });
-}
-
-export { supabase };
+// ✅ Always create exactly one instance on import
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+  },
+});
