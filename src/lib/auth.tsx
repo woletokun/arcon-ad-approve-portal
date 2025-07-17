@@ -1,6 +1,6 @@
 // src/lib/auth.tsx
 import { createContext, useContext, useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase"; // Adjust path to your Supabase client
+import { supabase } from "@/lib/supabase";
 
 const AuthContext = createContext(null);
 
@@ -9,6 +9,7 @@ export const AuthProvider = ({ children }) => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // 🔁 Fetch user profile from 'profiles' table
   const fetchProfile = async (userId) => {
     const { data, error } = await supabase
       .from("profiles")
@@ -17,12 +18,13 @@ export const AuthProvider = ({ children }) => {
       .single();
 
     if (error) {
-      console.error("Error loading profile:", error.message);
+      console.error("Error fetching profile:", error.message);
     } else {
       setProfile(data);
     }
   };
 
+  // 🔐 Load session and user on mount
   useEffect(() => {
     const getSession = async () => {
       const {
@@ -40,7 +42,7 @@ export const AuthProvider = ({ children }) => {
     getSession();
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      async (_event, session) => {
         if (session?.user) {
           setUser(session.user);
           await fetchProfile(session.user.id);
@@ -51,13 +53,25 @@ export const AuthProvider = ({ children }) => {
       }
     );
 
-    return () => {
-      authListener?.subscription?.unsubscribe();
-    };
+    return () => authListener?.subscription?.unsubscribe();
   }, []);
 
+  // 🧠 Sign in method
+  const signIn = (email, password) =>
+    supabase.auth.signInWithPassword({ email, password });
+
+  // 🧠 Sign up method
+  const signUp = (email, password, metadata) =>
+    supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: metadata,
+      },
+    });
+
   return (
-    <AuthContext.Provider value={{ user, profile, loading }}>
+    <AuthContext.Provider value={{ user, profile, loading, signIn, signUp }}>
       {children}
     </AuthContext.Provider>
   );
