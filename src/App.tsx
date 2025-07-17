@@ -1,33 +1,37 @@
+// src/App.tsx
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Landing } from "./pages/Landing";
-import { Dashboard } from "./pages/Dashboard";
-import { Auth } from "./pages/Auth";
-import { useAuth } from "@/lib/auth";
-import { SubmitAd } from "./pages/SubmitAd";
-import { MySubmissions } from "./pages/MySubmissions";
-import { ReviewPanel } from "./pages/ReviewPanel";
-import { Verify } from "./pages/Verify";
-import NotFound from "./pages/NotFound";
-import { AuthProvider } from "./hooks/useAuth";
+
+// Pages
+import { Landing } from "@/pages/Landing";
+import { Dashboard } from "@/pages/Dashboard";
+import { Auth } from "@/pages/Auth";
+import { SubmitAd } from "@/pages/SubmitAd";
+import { MySubmissions } from "@/pages/MySubmissions";
+import { ReviewPanel } from "@/pages/ReviewPanel";
+import { Verify } from "@/pages/Verify";
+import NotFound from "@/pages/NotFound";
+
+// ✅ Correct AuthProvider import
+import { AuthProvider } from "@/lib/auth";
 
 // ✅ Only ONE App component should be declared
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <AuthProvider> {/* ✅ this must wrap everything */}
+  <AuthProvider> {/* ✅ This must be outermost so all routes and providers have access */}
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
         <Toaster />
         <Sonner />
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/auth" element={<Auth />} />
-            <Route path="/dashboard" element={<Dashboard />} /> {/* etc */}
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/submit" element={<SubmitAd />} />
             <Route path="/my-submissions" element={<MySubmissions />} />
             <Route path="/review" element={<ReviewPanel />} />
@@ -36,9 +40,9 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
-      </AuthProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </AuthProvider>
 );
 
 export default App;
