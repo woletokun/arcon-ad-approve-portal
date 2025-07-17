@@ -1,14 +1,15 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useAuth } from '@/hooks/useAuth';
-import { useToast } from '@/components/ui/use-toast';
-import { Loader2, ShieldCheck } from 'lucide-react';
+// src/pages/Auth.tsx
+import { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useAuth } from "@/lib/auth";
+import { useToast } from "@/components/ui/use-toast";
+import { Loader2, ShieldCheck } from "lucide-react";
 
 export const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -16,10 +17,10 @@ export const Auth = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Redirect if already authenticated
+  // Redirect to dashboard if already logged in
   useEffect(() => {
     if (user) {
-      navigate('/dashboard');
+      navigate("/dashboard");
     }
   }, [user, navigate]);
 
@@ -28,8 +29,8 @@ export const Auth = () => {
     setIsLoading(true);
 
     const formData = new FormData(e.currentTarget);
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
 
     const { error } = await signIn(email, password);
 
@@ -42,9 +43,12 @@ export const Auth = () => {
     } else {
       toast({
         title: "Welcome back!",
-        description: "You have been signed in successfully.",
+        description: "Signing you in...",
       });
-      navigate('/dashboard');
+
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 1000);
     }
 
     setIsLoading(false);
@@ -55,18 +59,18 @@ export const Auth = () => {
     setIsLoading(true);
 
     const formData = new FormData(e.currentTarget);
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
-    const fullName = formData.get('fullName') as string;
-    const companyName = formData.get('companyName') as string;
-    const phone = formData.get('phone') as string;
-    const role = formData.get('role') as string;
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const fullName = formData.get("fullName") as string;
+    const companyName = formData.get("companyName") as string;
+    const phone = formData.get("phone") as string;
+    const role = formData.get("role") as string;
 
     const { error } = await signUp(email, password, {
       full_name: fullName,
       company_name: companyName,
       phone,
-      role
+      role,
     });
 
     if (error) {
@@ -78,7 +82,7 @@ export const Auth = () => {
     } else {
       toast({
         title: "Account Created!",
-        description: "Please check your email to verify your account. You may need to check your spam folder.",
+        description: "Check your email to verify your account.",
       });
     }
 
@@ -95,9 +99,7 @@ export const Auth = () => {
             </div>
           </div>
           <h1 className="text-2xl font-bold">ARCON e-Ad Portal</h1>
-          <p className="text-muted-foreground">
-            Advertisement Approval & Verification System
-          </p>
+          <p className="text-muted-foreground">Advertisement Approval & Verification System</p>
         </div>
 
         <Card>
@@ -118,25 +120,11 @@ export const Auth = () => {
                 <form onSubmit={handleSignIn} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="signin-email">Email</Label>
-                    <Input
-                      id="signin-email"
-                      name="email"
-                      type="email"
-                      placeholder="Enter your email"
-                      required
-                      disabled={isLoading}
-                    />
+                    <Input id="signin-email" name="email" type="email" required disabled={isLoading} />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="signin-password">Password</Label>
-                    <Input
-                      id="signin-password"
-                      name="password"
-                      type="password"
-                      placeholder="Enter your password"
-                      required
-                      disabled={isLoading}
-                    />
+                    <Input id="signin-password" name="password" type="password" required disabled={isLoading} />
                   </div>
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -150,13 +138,7 @@ export const Auth = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="fullName">Full Name</Label>
-                      <Input
-                        id="fullName"
-                        name="fullName"
-                        placeholder="John Doe"
-                        required
-                        disabled={isLoading}
-                      />
+                      <Input id="fullName" name="fullName" required disabled={isLoading} />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="role">Role</Label>
@@ -173,44 +155,19 @@ export const Auth = () => {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="signup-email">Email</Label>
-                    <Input
-                      id="signup-email"
-                      name="email"
-                      type="email"
-                      placeholder="Enter your email"
-                      required
-                      disabled={isLoading}
-                    />
+                    <Input id="signup-email" name="email" type="email" required disabled={isLoading} />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="companyName">Company Name</Label>
-                    <Input
-                      id="companyName"
-                      name="companyName"
-                      placeholder="Your Company Ltd"
-                      disabled={isLoading}
-                    />
+                    <Input id="companyName" name="companyName" disabled={isLoading} />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="phone">Phone Number</Label>
-                    <Input
-                      id="phone"
-                      name="phone"
-                      type="tel"
-                      placeholder="+234 xxx xxx xxxx"
-                      disabled={isLoading}
-                    />
+                    <Input id="phone" name="phone" type="tel" disabled={isLoading} />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="signup-password">Password</Label>
-                    <Input
-                      id="signup-password"
-                      name="password"
-                      type="password"
-                      placeholder="Create a password"
-                      required
-                      disabled={isLoading}
-                    />
+                    <Input id="signup-password" name="password" type="password" required disabled={isLoading} />
                   </div>
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
