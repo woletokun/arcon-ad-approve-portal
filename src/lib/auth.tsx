@@ -69,6 +69,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(null);
         setProfile(null);
       }
+      setLoading(false); // ✅ This was missing
     });
 
     return () => subscription.unsubscribe();
