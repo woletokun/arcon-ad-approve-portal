@@ -30,7 +30,8 @@ import {
  */
 
 export const Landing = () => {
-  const { user } = useAuth();
+  const session = useAuth();
+  const user = session?.user;
   const [selectedRole, setSelectedRole] = useState<'advertiser' | 'reviewer'>('advertiser');
 
   const features = {
