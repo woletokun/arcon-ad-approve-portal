@@ -10,12 +10,13 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   preview: {
-    port: 8080, // Make sure it's the same as server if needed
-    allowedHosts: ["arcon-ad-approve-portal.onrender.com"], // ✅ Fixes the blocked request issue
+    port: 8080,
+    allowedHosts: ['arcon-ad-approve-portal.onrender.com'],
   },
   plugins: [
     react(),
-    mode === 'development' && componentTagger(),
+    mode === 'development' &&
+    componentTagger(),
   ].filter(Boolean),
   resolve: {
     alias: {
